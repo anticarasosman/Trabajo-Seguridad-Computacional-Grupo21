@@ -119,9 +119,6 @@ def validate_url(url):
     if not url:
         raise ValueError("URL vacía")
 
-    if any(c.isspace() for c in url):
-        raise ValueError("URL contiene espacios en blanco")
-
     try:
         split = urllib.parse.urlsplit(url)
         hostname = split.hostname
