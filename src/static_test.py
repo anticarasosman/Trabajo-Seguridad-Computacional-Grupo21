@@ -12,4 +12,8 @@ df['static_phishing_score'] = df['url'].map(static.phishing_score)
 
 new_df = df.filter(['url', 'static_phishing_score', 'label'], axis=1)
 
-new_df.to_csv('static_phishing_test.csv')
+output_path = BASE_DIR / "outputs" / "static_phishing_test.csv"
+
+output_path.parent.mkdir(parents=True, exist_ok=True)
+
+new_df.to_csv(output_path, index=False)
