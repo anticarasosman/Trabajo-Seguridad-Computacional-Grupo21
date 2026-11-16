@@ -69,6 +69,14 @@ def f_num_sus(x):
     else:
         return 1
 
+def f_num_dots(x):
+    if x <= 2:
+        return 0.1
+    elif x == 3:
+        return 0.5
+    else:
+        return 1
+
 def f_num_ats(x):
     if x <= 0:
         return 0
@@ -91,9 +99,11 @@ def f_ip(x):
 
 def f_subdomains(x):
     if x <= 0:
-        return 0.1
+        return 0.0
     elif x <= 1:
-        return 0.3
+        return 0.1
+    elif x <= 2:
+        return 0.4
     else:
         return 1
 
@@ -134,17 +144,30 @@ def validate_url(url):
 
     return url
 
-def calc_score(features, weights, functions):
+def calc_score(features, weights, functions, verbose=False):
     score = 0
 
     for feature in features:
-        score += weights[feature] * functions[feature](features[feature])
+        feature_score = weights[feature] * functions[feature](features[feature])
+        score += feature_score
+        if verbose:
+            print(f"- {feature} -")
+            print(f"\t{feature}: {features[feature]}")
+            print(f"\tFeature Score: {feature_score}\n")
+
+    if verbose:
+        print("Final Score:", score)
 
     return score
 
 
-def phishing_score(url):
+def phishing_score(url, verbose=False):
     url = validate_url(url)
+
+    if verbose:
+        print("Summary for url:")
+        print(url)
+        print("")
 
     # Obtener indicadores/features
 
@@ -168,7 +191,12 @@ def phishing_score(url):
     except ValueError:
         is_ip_addr = False
 
-    num_subdomains = len(extract.subdomain.split('.'))
+    subdomains = extract.subdomain.split('.') if extract.subdomain else []
+
+    if subdomains == ['www']:
+        num_subdomains = 0
+    else:
+        num_subdomains = len(subdomains)
 
     features = {
         "entropy": get_entropy(url),
@@ -212,7 +240,7 @@ def phishing_score(url):
         "url_length": f_url_length,
         "num_www": f_num_sus,
         "ratio_digits": f_ratio,
-        "num_dots": f_num_sus,
+        "num_dots": f_num_dots,
         "num_hyphens": f_num_sus,
         "num_question": f_num_sus,
         "num_ats": f_num_ats,
@@ -224,7 +252,7 @@ def phishing_score(url):
         "host_length": f_host_length
     }
 
-    score = calc_score(features, weights, functions)
+    score = calc_score(features, weights, functions, verbose=verbose)
 
     return score
 
