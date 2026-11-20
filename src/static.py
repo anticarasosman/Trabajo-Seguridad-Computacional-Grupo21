@@ -136,9 +136,6 @@ def validate_url(url):
     except ValueError:
         raise ValueError("URL inválida")
 
-    if split.scheme.lower() not in ("http", "https"):
-        raise ValueError("scheme de la URL inválido")
-
     if not split.netloc or hostname is None:
         raise ValueError("La URL debe contener un hostname")
 
